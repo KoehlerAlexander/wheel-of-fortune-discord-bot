@@ -11,7 +11,7 @@ client.once('ready', () => {
   console.log('Ready!');
 });
 
-client.on('messageCreate', async message => {
+client.on('message', async message => {
   const { content } = message
   const messageComponents = content.split(" ")
   if (messageComponents[0] !== "!wg") return // reject non bot commands

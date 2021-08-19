@@ -65,7 +65,7 @@ export const handleAddGame = (message, messageComponents) => {
 /**
  * @param {Message} message
  */
-export const hanldeListGames = (message) => {
+export const handleListGames = (message) => {
   const guildData = getGuildData(message.guildId)
   if (!guildData) {
     message.reply("No games added yet!")
@@ -74,6 +74,55 @@ export const hanldeListGames = (message) => {
 
   const games = Object.values(guildData)
 
-  const gamesText = `Here is a list of the current games:\n${games.map(game => `${game.name}, ${game.timesPlayed} Plays`).join("\n")}`
+  const gamesText = `Here is a list of the currently registered games:\n${games.map(game => `${game.name}, ${game.timesPlayed} Plays`).join("\n")}`
   message.reply(gamesText)
+}
+
+/**
+ * Handles a spin of the wheel
+ * @param {Message} message 
+ */
+export const handlePlay = (message) => {
+  const guildData = getGuildData(message.guildId)
+  if (!guildData) {
+    message.reply("No games added yet!")
+    return
+  }
+
+  const games = Object.values(guildData)
+  const index = Math.floor(Math.random() * games.length)
+  const selectedGame = games[index]
+  message.reply(`Yay you are going to play:\n${selectedGame.name}, ${selectedGame.timesPlayed} Plays`)
+
+  //Update guild file
+  selectedGame.timesPlayed++
+  const guildPath = `./data/${message.guildId}.json`
+  fs.writeFileSync(guildPath, JSON.stringify(guildData))
+}
+
+/**
+* Handles a spin of the wheel
+* @param {Message} message 
+ * @param {String[]} messageComponents
+*/
+export const handleRemoveGame = (message, messageComponents) => {
+  const gameName = messageComponents[2]
+  const guildData = getGuildData(message.guildId)
+  if (!guildData) {
+    message.reply("No games added yet!")
+    return
+  }
+
+  const games = Object.values(guildData)
+  const gameToRemove = games.find(game => game.name === gameName)
+  if (!gameToRemove) {
+    message.reply(`Cannot find "${gameName}" in the registered games!`)
+    return
+  }
+
+  delete guildData[gameName]
+  const guildPath = `./data/${message.guildId}.json`
+  fs.writeFileSync(guildPath, JSON.stringify(guildData))
+
+  message.reply(`Game ${gameName} sucesfully removed!`)
 }

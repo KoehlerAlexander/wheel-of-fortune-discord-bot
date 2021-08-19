@@ -1,3 +1,4 @@
 /nodemodules
+/node_modules
 /data
 .env

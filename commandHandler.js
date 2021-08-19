@@ -1,6 +1,6 @@
 import { Message } from "discord.js"
 import { availableCommands } from "./commands.js"
-import fs from "fs"
+import fs, { existsSync } from "fs"
 
 /**
  * Returns the json data for a given messages guildId
@@ -45,6 +45,8 @@ export const handleAddGame = (message, messageComponents) => {
     const gamesData = {
       [gameName]: { name: gameName, timesPlayed: 0 }
     }
+    if (!existsSync("./data"))
+      fs.mkdirSync("./data")
     fs.writeFileSync(guildPath, JSON.stringify(gamesData))
 
     // games already registered for a guild
